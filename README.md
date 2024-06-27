@@ -34,7 +34,7 @@ To set up the project, follow these steps:
 
 1. **Clone the repository:**
     ```sh
-    git clone https://github.com/YuiKasumii/WakeOnLan_Private.git
+    git clone https://github.com/YuiKasumii/My_WakeOnLan.git
     ```
 2. **Navigate to the project directory:**
     ```sh
