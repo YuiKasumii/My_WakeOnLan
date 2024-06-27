@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Ping Status Toggle</title>
+    <meta charset="utf-8">
+    <meta name="description" content="Ping Status Toggle Example">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="keywords" content="Ping Status Toggle Example">
+    <meta name="author" content="Your Name">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600&display=swap" rel="stylesheet">
+
+    <link href="style.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <div class="button-container">
+            <h1 id="statusText">SERVER STATUS</h1>
+            <button class="power-on-button" id="powerOnButton" onclick="handlePowerOnClick()">Power ON</button>
+        </div>
+        <button class="failed-mode-button" aria-label="Toggle Light Mode" onclick="checkPingStatus()">
+            <span></span>
+            <span></span>
+        </button>
+    </div>
+
+    <script>
+        let waitingInterval;
+
+        function setLightMode(mode) {
+            var app = document.getElementsByTagName("BODY")[0];
+            var powerOnButton = document.getElementById("powerOnButton");
+            var statusText = document.getElementById("statusText");
+            if (mode === "failed") {
+                app.setAttribute("failed-mode", "failed");
+                statusText.innerText = "SERVER ODOO [192.168.1.115]";
+                powerOnButton.classList.add("show");
+            } else {
+                app.setAttribute("failed-mode", "success");
+                statusText.innerText = "SERVER ODOO ONLINE";
+                powerOnButton.classList.remove("show");
+                stopWaitingAnimation();
+            }
+        }
+
+        function checkPingStatus() {
+            fetch('ping_api.php?ip=192.168.1.115&count=1')
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data.result); // Log the result to the console
+                    if (data.result === 'success') {
+                        setLightMode("success");
+                    } else {
+                        setLightMode("failed");
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    setLightMode("failed");
+                });
+        }
+
+        function startWaitingAnimation() {
+            var powerOnButton = document.getElementById("powerOnButton");
+            powerOnButton.disabled = true;
+            let waitText = "Waiting";
+            powerOnButton.innerText = waitText;
+            let dotCount = 0;
+
+            waitingInterval = setInterval(() => {
+                dotCount = (dotCount + 1) % 4;
+                powerOnButton.innerText = waitText + '.'.repeat(dotCount);
+            }, 500);
+        }
+
+        function stopWaitingAnimation() {
+            clearInterval(waitingInterval);
+            var powerOnButton = document.getElementById("powerOnButton");
+            powerOnButton.disabled = false;
+            powerOnButton.innerText = "Power ON";
+        }
+
+        function handlePowerOnClick() {
+            var powerOnButton = document.getElementById("powerOnButton");
+            if (!powerOnButton.disabled) {
+                startWaitingAnimation();
+                fetch('wol.php')
+                    .then(response => response.text())
+                    .then(data => {
+                        console.log(data);
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            }
+        }
+
+        // Check the ping status when the page loads and every second thereafter
+        checkPingStatus();
+        setInterval(checkPingStatus, 2000);
+    </script>
+</body>
+</html>
