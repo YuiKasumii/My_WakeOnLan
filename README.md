@@ -3,6 +3,9 @@
 
 This project provides a web interface to manage and monitor the status of a server using ping status and Wake-on-LAN (WoL) functionality. The interface allows you to power on the server and check its current status.
 
+# Screenshoot
+![Alt text](Screenshoot.png)
+
 ## Table of Contents
 
 - [Project Overview](#project-overview)
